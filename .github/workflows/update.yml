@@ -1,0 +1,36 @@
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch: { }
+
+env:
+  YADISK_DEST_PATH: ${{ vars.YADISK_DEST_PATH }}
+  YADISK_SOURCE_PATH: ${{ vars.YADISK_SOURCE_PATH }}
+  YANDEX_CLIENT_ID: ${{ vars.YANDEX_CLIENT_ID }}
+
+jobs:
+  cd:
+    runs-on: ubuntu-latest
+    environment: main
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - uses: abatilo/actions-poetry@v4
+        with:
+          poetry-version: latest
+      - uses: actions/cache@v3
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}
+      - run: poetry install --no-interaction
+      - run: |
+          poetry run refresh_yadisk_listings \
+            --yadisk-source-path "${{ env.YADISK_SOURCE_PATH }}" \
+            --yadisk-dest-path "${{ env.YADISK_DEST_PATH }}" \
+            --categories Figure \
+            --yandex-client-id ${{ env.YANDEX_CLIENT_ID }} \
+            --yandex-client-secret ${{ secrets.YANDEX_CLIENT_SECRET }} \
+            --yandex-access-token ${{ secrets.YANDEX_ACCESS_TOKEN }} \
+            --upload

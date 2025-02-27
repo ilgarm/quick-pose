@@ -14,7 +14,8 @@ from yadisk.exceptions import PathNotFoundError
 YA_DISK_PATH_PREFIX = 'disk:/'
 
 
-def list_remote_files_itr(source_path: Path, mime_types: [str], ya_client: yadisk.Client, fp: TextIO) -> int:
+def list_remote_files_itr(root_path: Path, source_path: Path, mime_types: [str],
+                          ya_client: yadisk.Client, fp: TextIO) -> int:
     count = 0
     dirs = []
     for obj in ya_client.listdir(f'{YA_DISK_PATH_PREFIX}{source_path}'):
@@ -25,11 +26,17 @@ def list_remote_files_itr(source_path: Path, mime_types: [str], ya_client: yadis
         else:
             if obj.mime_type in mime_types:
                 count += 1
-                fp.write(json.dumps({'path': str(obj_path), 'url': obj.file}))
+                d = json.dumps({
+                    'root_path': str(root_path),
+                    'obj_path': str(obj_path),
+                    'preview_url': obj.preview,
+                    'original_url': obj.sizes['ORIGINAL'],
+                })
+                fp.write(d)
                 fp.write('\n')
 
     for obj_path in dirs:
-        count += list_remote_files_itr(obj_path, mime_types, ya_client, fp)
+        count += list_remote_files_itr(root_path, obj_path, mime_types, ya_client, fp)
 
     return count
 
@@ -42,7 +49,7 @@ def list_remote_files(source_path: Path, mime_types: [str],
     with ya_client, open(tmppath.joinpath(f'{category}.jsonl'), 'w') as fp:
         assert ya_client.check_token()
         category_source_path = source_path.joinpath(category)
-        return category, list_remote_files_itr(category_source_path, mime_types, ya_client, fp)
+        return category, list_remote_files_itr(source_path, category_source_path, mime_types, ya_client, fp)
 
 
 def write_listings(dest_path: Path,

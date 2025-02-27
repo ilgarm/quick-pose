@@ -65,7 +65,8 @@
         </header>
 
         <div class="entry-content">
-            <input id="timeout" type="text" data-slider="true" data-slider-range="10,300" data-slider-values="10,20,30,60,120,180,300">
+            <input id="timeout" type="text" data-slider="true" data-slider-range="10,300"
+                   data-slider-values="10,20,30,60,120,180,300">
             <button class="open-gallery">Start</button>
             <div class="container" style="display: none">
                 <div class="gallery">
@@ -82,7 +83,7 @@
 
 <script>
     (function () {
-        let timeout = 2000;
+        let timeout = 10000;
         let interval = null;
 
         $("#timeout").bind("slider:changed", function (event, data) {

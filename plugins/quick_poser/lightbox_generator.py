@@ -21,14 +21,14 @@ def add_article(article_generator):
         yandex_client_id,
         yandex_client_secret,
         yandex_access_token,
-        images_path,
+        content_path,
     ) = itemgetter(
         'YADISK_PATH_PREFIX',
         'YADISK_LISTINGS_PATH',
         'YANDEX_CLIENT_ID',
         'YANDEX_CLIENT_SECRET',
         'YANDEX_ACCESS_TOKEN',
-        'IMAGES_PATH',
+        'PATH',
     )(settings)
 
     ya_client = yadisk.Client(yandex_client_id, yandex_client_secret, yandex_access_token)
@@ -56,7 +56,7 @@ def add_article(article_generator):
                     if r.status_code == 200:
                         root_path, obj_path = Path(image_details['root_path']), Path(image_details['obj_path'])
                         image_path = obj_path.relative_to(root_path)
-                        image_filepath = images_path / image_path
+                        image_filepath = content_path / Path('images') / image_path
                         image_filepath.parent.mkdir(parents=True, exist_ok=True)
                         image_url = f'images/{image_path}'
                         with open(image_filepath, 'wb') as f:

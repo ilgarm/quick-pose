@@ -26,7 +26,7 @@ DEFAULT_PAGINATION = False
 TAGS_SAVE_AS = ''
 TAG_SAVE_AS = ''
 
-IMAGES_PATH = 'content/images'
+IMAGES_PATH = f'{PATH}/images'
 STATIC_PATHS = ['images', 'assets']
 
 THEME_TEMPLATES_OVERRIDES = ['templates']
